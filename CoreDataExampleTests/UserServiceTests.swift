@@ -23,7 +23,6 @@ class UserServiceTests: XCTestCase {
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
         
         coreDataStack = nil
@@ -38,7 +37,6 @@ class UserServiceTests: XCTestCase {
         
         userService.addUser("Joel Armstrong", phoneNumber: "123-456-7890")
         
-        //3
         waitForExpectationsWithTimeout(2.0){ error in
             XCTAssertNil(error, "Save did not occur")
         }
@@ -56,7 +54,7 @@ class UserServiceTests: XCTestCase {
     
     func testGetNoUser() {
         
-        let user = userService.getUser("Kazutoshi Baba")
+        let user = userService.getUser("Joel Armstrong")
         
         XCTAssertNil(user, "No user should be returned")
     }
