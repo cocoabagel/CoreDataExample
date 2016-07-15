@@ -18,8 +18,9 @@ public class UserService {
         self.coreDataStack = coreDataStack
     }
     
-    public func addUser(name: String, phoneNumber: String) -> User? {
-        let user = NSEntityDescription.insertNewObjectForEntityForName("User", inManagedObjectContext: managedObjectContext) as! User
+    @discardableResult
+    public func addUser(_ name: String, phoneNumber: String) -> User? {
+        let user = NSEntityDescription.insertNewObject(forEntityName: "User", into: managedObjectContext) as! User
         user.fullName = name
         user.phoneNumber = phoneNumber
         
@@ -28,19 +29,19 @@ public class UserService {
         return user
     }
     
-    public func deleteUser(name: String) {
+    public func deleteUser(_ name: String) {
         if let user = getUser(name) {
-            managedObjectContext.deleteObject(user)
+            managedObjectContext.delete(user)
             coreDataStack.saveContext(managedObjectContext)
         }
     }
     
-    public func getUser(name: String) -> User? {
-        let fetchRequest = NSFetchRequest(entityName: "User")
-        fetchRequest.predicate = NSPredicate(format: "fullName == %@", name)
+    public func getUser(_ name: String) -> User? {
+        let fetchRequest = NSFetchRequest<User>(entityName: "User")
+        fetchRequest.predicate = Predicate(format: "fullName == %@", name)
         let results: [AnyObject]?
         do {
-            results = try managedObjectContext.executeFetchRequest(fetchRequest)
+            results = try managedObjectContext.fetch(fetchRequest)
         } catch {
             return nil
         }

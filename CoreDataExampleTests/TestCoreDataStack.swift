@@ -18,9 +18,9 @@ class TestCoreDataStack: CoreDataStack {
                 managedObjectModel: self.managedObjectModel)
             
             do {
-                try psc.addPersistentStoreWithType(
-                    NSInMemoryStoreType, configuration: nil,
-                    URL: nil, options: nil)
+                try psc.addPersistentStore(
+                    ofType: NSInMemoryStoreType, configurationName: nil,
+                    at: nil, options: nil)
             } catch {
                 fatalError()
             }

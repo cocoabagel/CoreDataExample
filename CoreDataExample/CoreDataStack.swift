@@ -16,31 +16,31 @@ public class CoreDataStack {
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     public var managedObjectModel: NSManagedObjectModel = {
-        var modelPath = NSBundle.mainBundle().pathForResource("CoreDataExample", ofType: "momd")
-        var modelURL = NSURL.fileURLWithPath(modelPath!)
-        var model = NSManagedObjectModel(contentsOfURL: modelURL)!
+        var modelPath = Bundle.main.pathForResource("CoreDataExample", ofType: "momd")
+        var modelURL = URL(fileURLWithPath: modelPath!)
+        var model = NSManagedObjectModel(contentsOf: modelURL)!
         
         return model
     }()
     
-    var applicationDocumentsDirectory: NSURL = {
-        let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
-        return urls[urls.count-1] as NSURL
+    var applicationDocumentsDirectory: URL = {
+        let urls = FileManager.default.urlsForDirectory(.documentDirectory, inDomains: .userDomainMask)
+        return urls[urls.count-1] as URL
     }()
     
     public lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
         print("Providing SQLite persistent store coordinator")
         
-        let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("CoreDataExample.sqlite")
+        let url = try! self.applicationDocumentsDirectory.appendingPathComponent("CoreDataExample.sqlite")
         var options = [NSInferMappingModelAutomaticallyOption: true, NSMigratePersistentStoresAutomaticallyOption: true]
         
         var psc = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
         do {
-            try psc.addPersistentStoreWithType(NSSQLiteStoreType, configuration:nil, URL: url, options: options)
+            try psc.addPersistentStore(ofType: NSSQLiteStoreType, configurationName:nil, at: url, options: options)
         } catch {
             print("Error when creating persistent store \(error)")
             fatalError()
@@ -50,7 +50,7 @@ public class CoreDataStack {
     }()
     
     public lazy var rootContext: NSManagedObjectContext = {
-        let context: NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+        let context: NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.persistentStoreCoordinator = self.persistentStoreCoordinator
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
@@ -58,32 +58,32 @@ public class CoreDataStack {
     }()
     
     public lazy var mainContext: NSManagedObjectContext = {
-        let mainContext: NSManagedObjectContext = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
-        mainContext.parentContext = self.rootContext
+        let mainContext: NSManagedObjectContext = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.mainQueueConcurrencyType)
+        mainContext.parent = self.rootContext
         mainContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "mainContextDidSave:", name: NSManagedObjectContextDidSaveNotification, object: mainContext)
+        NotificationCenter.default.addObserver(self, selector: #selector(CoreDataStack.mainContextDidSave(_:)), name: NSNotification.Name.NSManagedObjectContextDidSave, object: mainContext)
         
         return mainContext
     }()
     
     public func newDerivedContext() -> NSManagedObjectContext {
-        let context: NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
-        context.parentContext = self.mainContext
+        let context: NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = self.mainContext
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
         return context
     }
     
-    public func saveContext(context: NSManagedObjectContext) {
-        if context.parentContext === self.mainContext {
+    public func saveContext(_ context: NSManagedObjectContext) {
+        if context.parent === self.mainContext {
             self.saveDerivedContext(context)
             return
         }
         
-        context.performBlock() {
+        context.perform() {
             do {
-                try context.obtainPermanentIDsForObjects(Array(context.insertedObjects))
+                try context.obtainPermanentIDs(for: Array(context.insertedObjects))
             } catch {
                 print("Error obtaining permanent IDs for \(context.insertedObjects), \(error)")
             }
@@ -97,10 +97,10 @@ public class CoreDataStack {
         }
     }
     
-    public func saveDerivedContext(context: NSManagedObjectContext) {
-        context.performBlock() {
+    public func saveDerivedContext(_ context: NSManagedObjectContext) {
+        context.perform() {
             do {
-                try context.obtainPermanentIDsForObjects(Array(context.insertedObjects))
+                try context.obtainPermanentIDs(for: Array(context.insertedObjects))
             } catch {
                 print("Error obtaining permanent IDs for \(context.insertedObjects), \(error)")
             }
@@ -116,7 +116,7 @@ public class CoreDataStack {
         }
     }
     
-    @objc func mainContextDidSave(notification: NSNotification) {
+    @objc func mainContextDidSave(_ notification: Notification) {
         self.saveContext(self.rootContext)
     }
     
