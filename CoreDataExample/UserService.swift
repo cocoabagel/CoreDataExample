@@ -38,7 +38,7 @@ public class UserService {
     
     public func getUser(_ name: String) -> User? {
         let fetchRequest = NSFetchRequest<User>(entityName: "User")
-        fetchRequest.predicate = Predicate(format: "fullName == %@", name)
+        fetchRequest.predicate = NSPredicate(format: "fullName == %@", name)
         let results: [AnyObject]?
         do {
             results = try managedObjectContext.fetch(fetchRequest)

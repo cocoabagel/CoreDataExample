@@ -20,7 +20,7 @@ public class CoreDataStack {
     }
     
     public var managedObjectModel: NSManagedObjectModel = {
-        var modelPath = Bundle.main.pathForResource("CoreDataExample", ofType: "momd")
+        var modelPath = Bundle.main.path(forResource: "CoreDataExample", ofType: "momd")
         var modelURL = URL(fileURLWithPath: modelPath!)
         var model = NSManagedObjectModel(contentsOf: modelURL)!
         
@@ -28,14 +28,14 @@ public class CoreDataStack {
     }()
     
     var applicationDocumentsDirectory: URL = {
-        let urls = FileManager.default.urlsForDirectory(.documentDirectory, inDomains: .userDomainMask)
+        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return urls[urls.count-1] as URL
     }()
     
     public lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
         print("Providing SQLite persistent store coordinator")
         
-        let url = try! self.applicationDocumentsDirectory.appendingPathComponent("CoreDataExample.sqlite")
+        let url = self.applicationDocumentsDirectory.appendingPathComponent("CoreDataExample.sqlite")
         var options = [NSInferMappingModelAutomaticallyOption: true, NSMigratePersistentStoresAutomaticallyOption: true]
         
         var psc = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
