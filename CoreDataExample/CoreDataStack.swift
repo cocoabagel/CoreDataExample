@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-public class CoreDataStack {
+open class CoreDataStack {
     
     public init() {
         
