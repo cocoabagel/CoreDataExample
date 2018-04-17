@@ -33,7 +33,7 @@ open class CoreDataStack {
     }()
     
     public lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
-        print("Providing SQLite persistent store coordinator")
+        NSLog("Providing SQLite persistent store coordinator")
         
         let url = self.applicationDocumentsDirectory.appendingPathComponent("CoreDataExample.sqlite")
         var options = [NSInferMappingModelAutomaticallyOption: true, NSMigratePersistentStoresAutomaticallyOption: true]
@@ -42,7 +42,7 @@ open class CoreDataStack {
         do {
             try psc.addPersistentStore(ofType: NSSQLiteStoreType, configurationName:nil, at: url, options: options)
         } catch {
-            print("Error when creating persistent store \(error)")
+            NSLog("Error when creating persistent store \(error)")
             fatalError()
         }
         
@@ -85,13 +85,13 @@ open class CoreDataStack {
             do {
                 try context.obtainPermanentIDs(for: Array(context.insertedObjects))
             } catch {
-                print("Error obtaining permanent IDs for \(context.insertedObjects), \(error)")
+                NSLog("Error obtaining permanent IDs for \(context.insertedObjects), \(error)")
             }
             
             do {
                 try context.save()
             } catch {
-                print("Unresolved core data error: \(error)")
+                NSLog("Unresolved core data error: \(error)")
                 abort()
             }
         }
@@ -102,13 +102,13 @@ open class CoreDataStack {
             do {
                 try context.obtainPermanentIDs(for: Array(context.insertedObjects))
             } catch {
-                print("Error obtaining permanent IDs for \(context.insertedObjects), \(error)")
+                NSLog("Error obtaining permanent IDs for \(context.insertedObjects), \(error)")
             }
             
             do {
                 try context.save()
             } catch {
-                print("Unresolved core data error: \(error)")
+                NSLog("Unresolved core data error: \(error)")
                 abort()
             }
             
