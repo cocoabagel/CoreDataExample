@@ -31,7 +31,7 @@ class UserServiceTests: XCTestCase {
     
     func testRootContextIsSavedAfterAddingUser() {
         
-        expectation(forNotification: Notification.Name.NSManagedObjectContextDidSave.rawValue, object: coreDataStack.rootContext) { notification in
+        expectation(forNotification: NSNotification.Name(rawValue: Notification.Name.NSManagedObjectContextDidSave.rawValue), object: coreDataStack.rootContext) { notification in
             return true
         }
         
